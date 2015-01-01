@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <color name="genre_text">#696969</color>
+    <color name="genre_frame">#4682B4</color>
+</resources>

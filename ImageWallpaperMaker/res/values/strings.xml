@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ImageWallpaperMaker</string>
+    
+ 	<string name="RGB">RGB:</string>
+ 	<string name="HSV">HSV:</string>
+    <string name="YUV">YUV:</string>
+ 	<string name="HEX">HEX</string>
+ 	<string name="OKbtn">OK</string>
+ 	<string name="NGbtn">Cancel</string>
+ 	<string name="arrowRight">→</string>
+</resources>
