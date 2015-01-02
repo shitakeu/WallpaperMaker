@@ -2,6 +2,7 @@ package jp.takesin.wallpapermaker;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import jp.takesin.wallpapermaker.colorpicker.ColorPickerDialog;
 import jp.takesin.wallpapermaker.colorpicker.ColorPickerDialog.OnColorChangedListener;
@@ -21,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -37,10 +39,14 @@ public class MainActivity extends Activity {
 
 	private static final String TAG = MainActivity.class.getSimpleName();
 	
+	
 	private ArrayList<ItemData> mItemList = new ArrayList<ItemData>();
 	private int mBackgroundColor = Color.BLACK;
 	private int mTextColor = Color.WHITE;
-	private float mTextSize = 20;
+	private float mAddTextSize;
+	private float mEditTextSize;
+	
+	
 	
 	// assets以下のフォントファイル
 	private String[] mFontPaths = {
@@ -72,7 +78,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		mRootView = (RelativeLayout)findViewById(R.id.RelativeLayoutEditPre);
-		((Button) findViewById(R.id.BtnAdd)).setOnClickListener(new OnClickListener() {
+		(findViewById(R.id.ImgAdd)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				showAddTextDialog();
@@ -95,18 +101,18 @@ public class MainActivity extends Activity {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		final Spinner spinner = (Spinner) layout.findViewById(R.id.spnTextSize);
 		spinner.setAdapter(adapter);
+		spinner.setSelection(3);
 		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
-				mTextSize = Integer.valueOf(mTextViewSizeArray[position]);
+				mAddTextSize = Float.valueOf(mTextViewSizeArray[position]);
 			}
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 			}
 		});
-		
 		
 		// 文字列を入力するEditText
 		final EditText editView = (EditText) layout
@@ -135,16 +141,25 @@ public class MainActivity extends Activity {
 	}
 	
 	/**
-	 * 
+	 * RootViewにTextViewを追加する
 	 * @param 追加するする文字列　text
 	 */
 	private void addTextView(String text) {
 		final TextView textView = new TextView(getApplicationContext());
-		textView.setTextSize(mTextSize);
+		textView.setTextSize(mAddTextSize);
 		textView.setTextColor(mTextColor);
 		textView.setText(text);
-		textView.setOnTouchListener(new DragViewListener());
 		textView.setBackgroundResource(R.drawable.item_text_selector);
+		// ドラックして移動するためのリスナーを追加
+		textView.setOnTouchListener(new DragViewListener());
+		// クリックで文字サイズ、文字列変更処理
+		textView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				showEditTextDialog((TextView)v);
+			}
+		});
 		
 		final Point point = new Point();
 		point.x = 50;
@@ -160,8 +175,88 @@ public class MainActivity extends Activity {
 		
 		final ItemData item = new ItemData();
 		item.textView = textView;
-		item.point = point;
+		item.size = mAddTextSize;
 		mItemList.add(item);
+		textView.setTag(item);
+	}
+	
+	
+	/**
+	 * TextViewを追加する際に表示するダイアログ
+	 */
+	private void showEditTextDialog(final TextView textView) {
+
+		final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final View layout = inflater.inflate(R.layout.dialog_add_text, null,
+				false);
+
+		// フォントサイズを指定するSpinnerの設定
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, mTextViewSizeArray);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		final Spinner spinner = (Spinner) layout.findViewById(R.id.spnTextSize);
+		spinner.setAdapter(adapter);
+		
+		
+		final ItemData item = (ItemData)textView.getTag();
+		final int size =(int)item.size;
+		final int index = Arrays.asList(mTextViewSizeArray).indexOf(String.valueOf(size));
+		spinner.setSelection(index);
+		
+		
+		
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				mEditTextSize = Integer.valueOf(mTextViewSizeArray[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
+		});
+		
+		// 文字列を入力するEditText
+		final EditText editView = (EditText) layout
+				.findViewById(R.id.edtAddText);
+		editView.setText(textView.getText());
+
+		new AlertDialog.Builder(this)
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setTitle("文字を編集")
+				.setView(layout)
+				.setPositiveButton("完了", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						final String txt = editView.getText().toString();
+						if(TextUtils.isEmpty(txt)){
+							mRootView.removeView(textView);
+							mItemList.remove(textView.getTag());
+							return;
+						}
+						textView.setText(txt);
+						textView.setTextSize(mEditTextSize);
+						
+						final ItemData item = (ItemData)textView.getTag();
+						item.textView = textView;
+						item.size = mEditTextSize;
+					}
+				})
+				.setNegativeButton("キャンセル",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+							}
+						}
+				).setNeutralButton("削除",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								mRootView.removeView(textView);
+								mItemList.remove(textView.getTag());
+							}
+						})
+				.show();
 	}
 	
 
@@ -179,7 +274,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean ret = true;
 		
-		final Button addBtn = (Button) findViewById(R.id.BtnAdd);
+		final View addBtn = findViewById(R.id.ImgAdd);
 		addBtn.setVisibility(View.GONE);
 		for (ItemData itemData : mItemList) {
 			itemData.textView.setBackgroundColor(Color.TRANSPARENT);

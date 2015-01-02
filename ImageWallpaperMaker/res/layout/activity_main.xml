@@ -10,14 +10,24 @@
     tools:context="jp.takesin.wallpapermaker.MainActivity" 
     android:background="#000000">
 
-    <Button
-        android:id="@+id/BtnAdd"
+    <ImageView
+        android:id="@+id/ImgAdd"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_margin="10dp"
         android:background="@drawable/button_text_selector"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:text="+" />
-
+        android:src="@android:drawable/ic_menu_add" />
+    
+    <ImageView
+        android:id="@+id/ImgSet"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_text_selector"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:src="@android:drawable/ic_menu_preferences" />
 
 </RelativeLayout>

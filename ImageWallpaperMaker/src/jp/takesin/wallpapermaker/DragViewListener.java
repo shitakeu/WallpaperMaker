@@ -4,9 +4,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 public class DragViewListener implements OnTouchListener {
 	
@@ -14,6 +11,8 @@ public class DragViewListener implements OnTouchListener {
 	private float downY;
 	private int downLeftMargin;
 	private int downTopMargin;
+	
+	private boolean isMove = false; 
 	
 	@Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -24,17 +23,16 @@ public class DragViewListener implements OnTouchListener {
             (ViewGroup.MarginLayoutParams)v.getLayoutParams();
 
         if( event.getAction() == MotionEvent.ACTION_DOWN ){
-
+        	isMove = false;
             downX = event.getRawX();
             downY = event.getRawY();
 
             downLeftMargin = param.leftMargin;
             downTopMargin = param.topMargin;
-
-            return true;
+            return false;
         }
         else if( event.getAction() == MotionEvent.ACTION_MOVE){
-
+        	isMove = true;
             param.leftMargin = downLeftMargin + (int)(event.getRawX() - downX);
             param.topMargin = downTopMargin + (int)(event.getRawY() - downY);
 
@@ -43,8 +41,10 @@ public class DragViewListener implements OnTouchListener {
            param.topMargin, 
            param.leftMargin + v.getWidth(), 
            param.topMargin + v.getHeight());
-
-            return true;
+           return true;
+        }
+        else if( event.getAction() == MotionEvent.ACTION_UP){
+        	return isMove;
         }
 
         return false;

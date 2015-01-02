@@ -9,6 +9,6 @@ import android.widget.TextView;
 public class ItemData {
 	// アフリエイト用商品紹介URL
 	public TextView textView;
-	public Point point;
+	public float size;
 	
 }
