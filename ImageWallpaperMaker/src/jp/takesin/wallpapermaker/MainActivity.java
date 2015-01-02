@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,14 +33,27 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	private static final String TAG = MainActivity.class.getSimpleName();
-	private Button mAddBtn;
 	
 	private ArrayList<ItemData> mItemList = new ArrayList<ItemData>();
-	
 	private int mBackgroundColor = Color.BLACK;
-	
 	private int mTextColor = Color.WHITE;
 	private float mTextSize = 20;
+	
+	private String[] mFontPaths = {
+			null,
+            "fonts/ipaexg.ttf",
+            "fonts/ipaexm.ttf",
+            "fonts/hannari.ttf",
+            "fonts/bokutachi.ttf",
+            "fonts/kokoro.ttf"};
+	
+	private int[] mFontTextViewIds = {
+			R.id.textFont1,
+			R.id.textFont2,
+			R.id.textFont3,
+			R.id.textFont4,
+			R.id.textFont5,
+			R.id.textFont6};
 	
 	private RelativeLayout mRootView;
 	
@@ -50,8 +64,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		mRootView = (RelativeLayout)findViewById(R.id.RelativeLayoutEditPre);
-		mAddBtn = (Button) findViewById(R.id.BtnAdd);
-		mAddBtn.setOnClickListener(new OnClickListener() {
+		((Button) findViewById(R.id.BtnAdd)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				showAddTextDialog();
@@ -86,7 +99,8 @@ public class MainActivity extends Activity {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 							}
-						}).show();
+						}
+				).show();
 	}
 	
 	private void addTextView(String text) {
@@ -129,7 +143,12 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		boolean ret = true;
-		mAddBtn.setVisibility(View.GONE);
+		
+		final Button addBtn = (Button) findViewById(R.id.BtnAdd);
+		addBtn.setVisibility(View.GONE);
+		for (ItemData itemData : mItemList) {
+			itemData.textView.setBackgroundColor(Color.TRANSPARENT);
+		}
 		
 		switch (item.getItemId()) {
 		default:
@@ -153,26 +172,52 @@ public class MainActivity extends Activity {
 				Toast.makeText(getApplicationContext(), "壁紙に設定しました。",
 						Toast.LENGTH_SHORT).show();
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				Toast.makeText(getApplicationContext(), "設定に失敗しました。",
 						Toast.LENGTH_SHORT).show();
 			}
 
 			ret = true;
 			break;
+			
+		case R.id.action_text_color:
+			
+			// ダイアログ生成(Context, デフォルトの色)
+			final ColorPickerDialog txtDialog = new ColorPickerDialog(this, mTextColor);
+			// HEXの表示（非表示の場合はfalse）
+			txtDialog.setHexValueEnabled(false);
+			// アルファ値の表示（非表示の場合はfalse）
+			txtDialog.setAlphaSliderVisible(false);
+
+			// OKボタンが押下された時のハンドラ
+			txtDialog.setOnColorChangedListener(new OnColorChangedListener() {
+				@Override
+				public void onColorChanged(int newcolor) {
+					mTextColor = newcolor;
+					for (ItemData itemData : mItemList) {
+						itemData.textView.setTextColor(newcolor);
+					}
+				}
+			});
+
+			// ダイアログ表示
+			txtDialog.show();
+			
+			ret = true;
+			break;
 		case R.id.action_background_color:
 						
 			// ダイアログ生成(Context, デフォルトの色)
-			final ColorPickerDialog dialog = new ColorPickerDialog(this, mBackgroundColor);
+			final ColorPickerDialog bgDialog = new ColorPickerDialog(this, mBackgroundColor);
 
 			// HEXの表示（非表示の場合はfalse）
-			dialog.setHexValueEnabled(false);
+			bgDialog.setHexValueEnabled(false);
 
 			// アルファ値の表示（非表示の場合はfalse）
-			dialog.setAlphaSliderVisible(false);
+			bgDialog.setAlphaSliderVisible(false);
 
 			// OKボタンが押下された時のハンドラ
-			dialog.setOnColorChangedListener(new OnColorChangedListener() {
+			bgDialog.setOnColorChangedListener(new OnColorChangedListener() {
 			    @Override
 			    public void onColorChanged(int newcolor) {
 			    	mBackgroundColor = newcolor;
@@ -181,28 +226,58 @@ public class MainActivity extends Activity {
 			});
 
 			// ダイアログ表示
-			dialog.show();
-				
-//			final int color;
-//
-//			if (mBackgroundColor == Color.BLACK) {
-//				color = Color.WHITE;
-//				mTextColor = Color.BLACK;
-//				mBackgroundColor = Color.WHITE;
-//			} else {
-//				color = Color.BLACK;
-//				mTextColor = Color.WHITE;
-//				mBackgroundColor = Color.BLACK;
-//			}
-//			mRootView.setBackgroundColor(color);
-//			for (ItemData itemData : mItemList) {
-//				itemData.textView.setTextColor(mTextColor);
-//			}
+			bgDialog.show();
 
 			ret = true;
 			break;
+			
+		case R.id.action_fonts:
+			final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			final View layout = inflater.inflate(R.layout.dialog_fonts, null,
+					false);
+			
+			final AlertDialog fontSelectDialog = new AlertDialog.Builder(this)
+		    .setTitle("フォントを選択")
+		    .setView(layout)
+			.show();
+			
+			for(int i = 0; i < mFontTextViewIds.length; i++){
+				final Typeface typeface;
+				if(TextUtils.isEmpty(mFontPaths[i])){
+					typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
+				} else {
+					typeface = Typeface.createFromAsset(getAssets(), mFontPaths[i]);
+				}
+				
+				final TextView textView = (TextView)layout.findViewById(mFontTextViewIds[i]);
+				textView.setTypeface(typeface);
+				textView.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						setTextFornt(typeface);
+						fontSelectDialog.dismiss();
+					}
+				});
+			}
+			
+			ret = true;
+			break;
 		}
-		mAddBtn.setVisibility(View.VISIBLE);
+		
+		addBtn.setVisibility(View.VISIBLE);
+		for (ItemData itemData : mItemList) {
+			itemData.textView.setBackgroundResource(R.drawable.item_text_selector);
+		}
 		return ret;
+	}
+	
+	/**
+	 * 画面に追加しているTextViewのフォントを全て変更する
+	 * @param typeface
+	 */
+	private void setTextFornt(Typeface typeface){
+		for (ItemData itemData : mItemList) {
+			itemData.textView.setTypeface(typeface);
+		}
 	}
 }

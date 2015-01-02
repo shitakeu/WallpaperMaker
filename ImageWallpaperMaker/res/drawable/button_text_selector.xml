@@ -8,7 +8,7 @@
 
             <padding android:bottom="3dp" android:left="3dp" android:right="3dp" android:top="3dp" />
 
-            <solid android:color="#F0F8FF" />
+            <solid android:color="#66b7ff" />
         </shape></item>
     <item><shape>
             <stroke android:width="2dp" android:color="@color/genre_frame" />

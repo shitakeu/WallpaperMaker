@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textFont1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+    <TextView
+        android:id="@+id/textFont2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+    <TextView
+        android:id="@+id/textFont3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+    <TextView
+        android:id="@+id/textFont4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+        <TextView
+        android:id="@+id/textFont5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/textFont6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fonts_text_selector"
+        android:clickable="true"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="あいうえお"
+        android:textSize="24sp" />
+        
+</LinearLayout>
