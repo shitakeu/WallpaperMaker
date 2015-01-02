@@ -16,4 +16,13 @@
         <requestFocus />
     </EditText>
 
+    <Spinner
+        android:id="@+id/spnTextSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/edtAddText"
+        android:layout_marginTop="20dp" />
+
 </RelativeLayout>

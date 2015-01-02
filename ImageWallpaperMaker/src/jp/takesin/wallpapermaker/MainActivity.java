@@ -24,9 +24,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ public class MainActivity extends Activity {
 	private int mTextColor = Color.WHITE;
 	private float mTextSize = 20;
 	
+	// assets以下のフォントファイル
 	private String[] mFontPaths = {
 			null,
             "fonts/ipaexg.ttf",
@@ -47,6 +51,7 @@ public class MainActivity extends Activity {
             "fonts/bokutachi.ttf",
             "fonts/kokoro.ttf"};
 	
+	// TextViewのフォントを変更する際のViewId
 	private int[] mFontTextViewIds = {
 			R.id.textFont1,
 			R.id.textFont2,
@@ -54,6 +59,9 @@ public class MainActivity extends Activity {
 			R.id.textFont4,
 			R.id.textFont5,
 			R.id.textFont6};
+	
+	// 追加するTextViewのフォントサイズ
+	private String[] mTextViewSizeArray = {"8", "16", "24", "32", "40", "60", "120"}; 
 	
 	private RelativeLayout mRootView;
 	
@@ -72,12 +80,35 @@ public class MainActivity extends Activity {
 		});
 	}
 
+	/**
+	 * TextViewを追加する際に表示するダイアログ
+	 */
 	private void showAddTextDialog() {
 
 		final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final View layout = inflater.inflate(R.layout.dialog_add_text, null,
 				false);
 
+		// フォントサイズを指定するSpinnerの設定
+		final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, mTextViewSizeArray);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		final Spinner spinner = (Spinner) layout.findViewById(R.id.spnTextSize);
+		spinner.setAdapter(adapter);
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				mTextSize = Integer.valueOf(mTextViewSizeArray[position]);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
+		});
+		
+		
+		// 文字列を入力するEditText
 		final EditText editView = (EditText) layout
 				.findViewById(R.id.edtAddText);
 
@@ -103,6 +134,10 @@ public class MainActivity extends Activity {
 				).show();
 	}
 	
+	/**
+	 * 
+	 * @param 追加するする文字列　text
+	 */
 	private void addTextView(String text) {
 		final TextView textView = new TextView(getApplicationContext());
 		textView.setTextSize(mTextSize);
