@@ -64,13 +64,6 @@ public class MainActivity extends Activity {
 			R.id.textFont5,
 			R.id.textFont6};
 	
-	private String[] mSettingItems = {
-            "画像を保存",
-            "壁紙に設定す",
-            "文字色変更",
-            "フォント変更",
-            "キャンセル"};
-	
 	// 追加するTextViewのフォントサイズ
 	private String[] mTextViewSizeArray = {"8", "16", "24", "32", "40", "60", "120"}; 
 	
@@ -92,10 +85,9 @@ public class MainActivity extends Activity {
 		(findViewById(R.id.ImgSet)).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showSelectDialog();
+				openOptionsMenu();
 			}
 		});
-		
 	}
 
 	/**
@@ -297,53 +289,18 @@ public class MainActivity extends Activity {
 			ret = super.onOptionsItemSelected(item);
 			break;
 		case R.id.action_save:
-			final boolean saveFlag = BitmapUtil.saveBitmapToSd(BitmapUtil.getBitmap(mRootView));
-			String txt = "保存しました。";
-			if (!saveFlag) {
-				txt = "保存に失敗しました。";
-			}
-			Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT)
-					.show();
-
+			saveImage();
+			
 			ret = true;
 			break;
 		case R.id.action_setup:
-			final WallpaperManager wallman = WallpaperManager.getInstance(this);
-			try {
-				wallman.setBitmap(BitmapUtil.getBitmap(mRootView));
-				Toast.makeText(getApplicationContext(), "壁紙に設定しました。",
-						Toast.LENGTH_SHORT).show();
-			} catch (IOException e) {
-				//e.printStackTrace();
-				Toast.makeText(getApplicationContext(), "設定に失敗しました。",
-						Toast.LENGTH_SHORT).show();
-			}
-
+			settingWallpaper();
 			ret = true;
 			break;
 			
 		case R.id.action_text_color:
-			
-			// ダイアログ生成(Context, デフォルトの色)
-			final ColorPickerDialog txtDialog = new ColorPickerDialog(this, mTextColor);
-			// HEXの表示（非表示の場合はfalse）
-			txtDialog.setHexValueEnabled(false);
-			// アルファ値の表示（非表示の場合はfalse）
-			txtDialog.setAlphaSliderVisible(false);
+			settingTextColor();
 
-			// OKボタンが押下された時のハンドラ
-			txtDialog.setOnColorChangedListener(new OnColorChangedListener() {
-				@Override
-				public void onColorChanged(int newcolor) {
-					mTextColor = newcolor;
-					for (ItemData itemData : mItemList) {
-						itemData.textView.setTextColor(newcolor);
-					}
-				}
-			});
-
-			// ダイアログ表示
-			txtDialog.show();
 			
 			ret = true;
 			break;
@@ -374,33 +331,7 @@ public class MainActivity extends Activity {
 			break;
 			
 		case R.id.action_fonts:
-			final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			final View layout = inflater.inflate(R.layout.dialog_fonts, null,
-					false);
-			
-			final AlertDialog fontSelectDialog = new AlertDialog.Builder(this)
-		    .setTitle("フォントを選択")
-		    .setView(layout)
-			.show();
-			
-			for(int i = 0; i < mFontTextViewIds.length; i++){
-				final Typeface typeface;
-				if(TextUtils.isEmpty(mFontPaths[i])){
-					typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
-				} else {
-					typeface = Typeface.createFromAsset(getAssets(), mFontPaths[i]);
-				}
-				
-				final TextView textView = (TextView)layout.findViewById(mFontTextViewIds[i]);
-				textView.setTypeface(typeface);
-				textView.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						setTextFornt(typeface);
-						fontSelectDialog.dismiss();
-					}
-				});
-			}
+			settingTextFont();
 			
 			ret = true;
 			break;
@@ -413,6 +344,62 @@ public class MainActivity extends Activity {
 		return ret;
 	}
 	
+	private void settingTextColor(){
+		// ダイアログ生成(Context, デフォルトの色)
+		final ColorPickerDialog txtDialog = new ColorPickerDialog(this, mTextColor);
+		// HEXの表示（非表示の場合はfalse）
+		txtDialog.setHexValueEnabled(false);
+		// アルファ値の表示（非表示の場合はfalse）
+		txtDialog.setAlphaSliderVisible(false);
+
+		// OKボタンが押下された時のハンドラ
+		txtDialog.setOnColorChangedListener(new OnColorChangedListener() {
+			@Override
+			public void onColorChanged(int newcolor) {
+				mTextColor = newcolor;
+				for (ItemData itemData : mItemList) {
+					itemData.textView.setTextColor(newcolor);
+				}
+			}
+		});
+
+		// ダイアログ表示
+		txtDialog.show();
+	}
+	
+	/**
+	 * TextViewのフォントを変更する
+	 */
+	private void settingTextFont(){
+		final LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final View layout = inflater.inflate(R.layout.dialog_fonts, null,
+				false);
+		
+		final AlertDialog fontSelectDialog = new AlertDialog.Builder(this)
+	    .setTitle("フォントを選択")
+	    .setView(layout)
+		.show();
+		
+		for(int i = 0; i < mFontTextViewIds.length; i++){
+			final Typeface typeface;
+			if(TextUtils.isEmpty(mFontPaths[i])){
+				typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL);
+			} else {
+				typeface = Typeface.createFromAsset(getAssets(), mFontPaths[i]);
+			}
+			
+			final TextView textView = (TextView)layout.findViewById(mFontTextViewIds[i]);
+			textView.setTypeface(typeface);
+			textView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					setTextFornt(typeface);
+					fontSelectDialog.dismiss();
+				}
+			});
+		}
+	}
+	
 	/**
 	 * 画面に追加しているTextViewのフォントを全て変更する
 	 * @param typeface
@@ -422,4 +409,35 @@ public class MainActivity extends Activity {
 			itemData.textView.setTypeface(typeface);
 		}
 	}
+	
+	/**
+	 * 壁紙画像を保存する
+	 */
+	private void saveImage(){
+		final boolean saveFlag = BitmapUtil.saveBitmapToSd(BitmapUtil.getBitmap(mRootView));
+		String txt = "保存しました。";
+		if (!saveFlag) {
+			txt = "保存に失敗しました。";
+		}
+		Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT)
+				.show();
+	}
+	
+	/**
+	 * 壁紙に設定する
+	 */
+	private void settingWallpaper(){
+		final WallpaperManager wallman = WallpaperManager.getInstance(this);
+		try {
+			wallman.setBitmap(BitmapUtil.getBitmap(mRootView));
+			Toast.makeText(getApplicationContext(), "壁紙に設定しました。",
+					Toast.LENGTH_SHORT).show();
+		} catch (IOException e) {
+			//e.printStackTrace();
+			Toast.makeText(getApplicationContext(), "設定に失敗しました。",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+
 }
