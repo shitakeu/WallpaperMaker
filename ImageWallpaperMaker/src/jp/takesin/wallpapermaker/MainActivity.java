@@ -46,8 +46,6 @@ public class MainActivity extends Activity {
 	private float mAddTextSize;
 	private float mEditTextSize;
 	
-	
-	
 	// assets以下のフォントファイル
 	private String[] mFontPaths = {
 			null,
@@ -65,6 +63,13 @@ public class MainActivity extends Activity {
 			R.id.textFont4,
 			R.id.textFont5,
 			R.id.textFont6};
+	
+	private String[] mSettingItems = {
+            "画像を保存",
+            "壁紙に設定す",
+            "文字色変更",
+            "フォント変更",
+            "キャンセル"};
 	
 	// 追加するTextViewのフォントサイズ
 	private String[] mTextViewSizeArray = {"8", "16", "24", "32", "40", "60", "120"}; 
@@ -84,6 +89,13 @@ public class MainActivity extends Activity {
 				showAddTextDialog();
 			}
 		});
+		(findViewById(R.id.ImgSet)).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				showSelectDialog();
+			}
+		});
+		
 	}
 
 	/**
